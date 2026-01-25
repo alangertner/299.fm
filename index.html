@@ -1,34 +1,529 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LIGHT</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Space Grotesk', sans-serif;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #000;
-        }
-        h1 {
-            font-size: clamp(2rem, 12vw, 8rem);
-            font-weight: 700;
-            color: #D4FF00;
-            letter-spacing: 0.05em;
-            text-shadow: 0 0 40px rgba(212, 255, 0, 0.5),
-                         0 0 80px rgba(212, 255, 0, 0.3),
-                         0 0 120px rgba(212, 255, 0, 0.1);
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="299.fm — LIGHT. A typographic composition inspired by Le Corbusier.">
+  <meta name="theme-color" content="#FFFFFF">
+  <meta name="color-scheme" content="light dark">
+  
+  <!-- Open Graph -->
+  <meta property="og:title" content="299.fm — LIGHT">
+  <meta property="og:description" content="L⚡I⚡G⚡H⚡T — A typographic composition inspired by Le Corbusier.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://299.fm">
+  
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="299.fm — LIGHT">
+  <meta name="twitter:description" content="L⚡I⚡G⚡H⚡T — A typographic composition inspired by Le Corbusier.">
+  
+  <!-- Animated Favicon -->
+  <link rel="icon" id="favicon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><path fill='%231A1A1A' d='M18 2L6 16h6L4 30l20-16h-8l8-12z'/></svg>">
+  
+  <title>299.fm — LIGHT</title>
+  
+  <!-- 
+    ═══════════════════════════════════════════════════════════════════
+    299.fm Splash Page
+    ═══════════════════════════════════════════════════════════════════
+    
+    Designed in the spirit of Le Corbusier
+    
+    "Architecture is the masterly, correct and magnificent 
+     play of masses brought together in light."
+    
+    Proportions: Modulor system (φ = 1.618)
+    Typography: Archivo Black — geometric, architectural
+    Color: White as material, charcoal as structure
+    Animation: Light as breath
+    
+    ═══════════════════════════════════════════════════════════════════
+  -->
+  
+  <!-- Typeface: Archivo Black — Geometric, strong, architectural -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap" rel="stylesheet">
+  
+  <style>
+    /*
+     * ═══════════════════════════════════════════════════════════════
+     * MODULOR SYSTEM — Custom Properties
+     * ═══════════════════════════════════════════════════════════════
+     * Based on Le Corbusier's proportional system
+     * Golden Ratio: φ = 1.618033988749895
+     * Fibonacci spacing: 8, 13, 21, 34, 55, 89, 144, 233
+     */
+    
+    :root {
+      /* ─── Colors ─── */
+      --white: #FFFFFF;
+      --off-white: #FAFAF8;
+      --concrete: #B8B5AA;
+      --charcoal: #1A1A1A;
+      --shadow: #2C2C2C;
+      
+      /* ─── Modulor Spacing (Fibonacci) ─── */
+      --space-1: 8px;
+      --space-2: 13px;
+      --space-3: 21px;
+      --space-4: 34px;
+      --space-5: 55px;
+      --space-6: 89px;
+      --space-7: 144px;
+      --space-8: 233px;
+      
+      /* ─── Typography Scale (Golden Ratio) ─── */
+      --text-base: 16px;
+      --text-1: 26px;    /* 16 × φ */
+      --text-2: 42px;    /* 26 × φ */
+      --text-3: 68px;    /* 42 × φ */
+      --text-4: 110px;   /* 68 × φ */
+      --text-5: 178px;   /* 110 × φ — Hero */
+      
+      /* ─── Golden Ratio ─── */
+      --phi: 1.618033988749895;
+      
+      /* ─── Animation ─── */
+      --duration-breath: 6s;
+      
+      /* ─── Layout ─── */
+      --letter-spacing: 0.15em;
+      --bolt-scale: 0.35;
+    }
+    
+    /*
+     * ═══════════════════════════════════════════════════════════════
+     * RESET — Purist Foundation
+     * ═══════════════════════════════════════════════════════════════
+     */
+    
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    /*
+     * ═══════════════════════════════════════════════════════════════
+     * BODY — The Void
+     * ═══════════════════════════════════════════════════════════════
+     * "White is the color of all colors"
+     */
+    
+    html, body {
+      height: 100%;
+      width: 100%;
+    }
+    
+    body {
+      font-family: 'Archivo Black', -apple-system, BlinkMacSystemFont, 
+                   'Helvetica Neue', Helvetica, Arial, sans-serif;
+      background-color: var(--white);
+      color: var(--charcoal);
+      
+      /* Anti-aliasing for crisp edges */
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+      
+      /* Prevent horizontal scroll */
+      overflow-x: hidden;
+    }
+    
+    /*
+     * ═══════════════════════════════════════════════════════════════
+     * MAIN — The Frame
+     * ═══════════════════════════════════════════════════════════════
+     * Centered in the void, like a building in landscape
+     */
+    
+    main {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      min-height: 100dvh; /* Dynamic viewport height for mobile */
+      width: 100%;
+      padding: var(--space-4);
+    }
+    
+    /*
+     * ═══════════════════════════════════════════════════════════════
+     * COMPOSITION — The Word as Architecture
+     * ═══════════════════════════════════════════════════════════════
+     */
+    
+    .composition {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      
+      /* Allow natural flow */
+      flex-wrap: nowrap;
+    }
+    
+    /*
+     * ═══════════════════════════════════════════════════════════════
+     * TYPOGRAPHY — Letters as Pilotis
+     * ═══════════════════════════════════════════════════════════════
+     * Each letter stands as a structural element
+     */
+    
+    h1 {
+      /* Screen reader text */
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+    
+    .letter {
+      font-size: clamp(var(--text-3), 15vw, var(--text-5));
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: var(--letter-spacing);
+      color: var(--charcoal);
+      
+      /* Architectural presence */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      
+      /* Subtle text shadow for depth */
+      text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.02);
+      
+      /* Selection styling */
+      user-select: none;
+      
+    }
+    
+    /*
+     * ═══════════════════════════════════════════════════════════════
+     * LIGHTNING BOLT — Geometric Construction
+     * ═══════════════════════════════════════════════════════════════
+     * 
+     * Le Corbusier would draw this with:
+     * - Precise 60° angles (equilateral triangle reference)
+     * - Stroke-based construction (architectural drawing)
+     * - Proportions relative to the Modulor
+     * 
+     * The bolt represents energy, light, the spark of creation.
+     * It is drawn as Le Corbusier might sketch it:
+     * with ruler, compass, and purpose.
+     */
+    
+    .bolt {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      
+      /* Size relative to letters */
+      width: clamp(28px, 6vw, 62px);
+      height: clamp(48px, 10vw, 106px);
+      
+      /* Spacing rhythm */
+      margin: 0 clamp(var(--space-1), 1.5vw, var(--space-3));
+      
+      /* Entry animation handled above */
+    }
+    
+    .bolt svg {
+      width: 100%;
+      height: 100%;
+      
+      /* Ensure crisp rendering */
+      shape-rendering: geometricPrecision;
+    }
+    
+    .bolt-path {
+      fill: var(--charcoal);
+      
+      /* Subtle animation: light breathing */
+      animation: breath var(--duration-breath) ease-in-out infinite;
+    }
+    
+    /* Stagger the animation for organic rhythm */
+    .bolt:nth-child(2) .bolt-path { animation-delay: 0s; }
+    .bolt:nth-child(4) .bolt-path { animation-delay: 1.5s; }
+    .bolt:nth-child(6) .bolt-path { animation-delay: 3s; }
+    .bolt:nth-child(8) .bolt-path { animation-delay: 4.5s; }
+    
+    /*
+     * ═══════════════════════════════════════════════════════════════
+     * ANIMATION — Light as Breath
+     * ═══════════════════════════════════════════════════════════════
+     * Barely perceptible. Like light shifting on a white wall
+     * as the sun moves across the sky.
+     */
+    
+    @keyframes breath {
+      0%, 100% {
+        fill: var(--charcoal);
+      }
+      50% {
+        fill: #FFD93D;
+      }
+    }
+    
+    /* Respect user preference for reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      .bolt-path {
+        animation: none;
+      }
+    }
+    
+    /*
+     * ═══════════════════════════════════════════════════════════════
+     * RESPONSIVE — Modulor Across Scales
+     * ═══════════════════════════════════════════════════════════════
+     * The proportions remain constant; the scale adapts.
+     */
+    
+    /* Large screens: maximum presence */
+    @media (min-width: 1440px) {
+      .composition {
+        transform: scale(1.1);
+      }
+    }
+    
+    /* Standard desktop */
+    @media (min-width: 1024px) and (max-width: 1439px) {
+      /* Default styling applies */
+    }
+    
+    /* Tablet */
+    @media (min-width: 768px) and (max-width: 1023px) {
+      :root {
+        --letter-spacing: 0.12em;
+      }
+    }
+    
+    /* Mobile landscape */
+    @media (max-width: 767px) and (orientation: landscape) {
+      :root {
+        --letter-spacing: 0.1em;
+      }
+      
+      .bolt {
+        margin: 0 clamp(4px, 1vw, 12px);
+      }
+    }
+    
+    /* Mobile portrait */
+    @media (max-width: 767px) and (orientation: portrait) {
+      :root {
+        --letter-spacing: 0.08em;
+      }
+      
+      main {
+        padding: var(--space-3);
+      }
+      
+      .bolt {
+        width: clamp(20px, 5vw, 40px);
+        height: clamp(34px, 8.5vw, 68px);
+        margin: 0 clamp(2px, 0.8vw, 8px);
+      }
+    }
+    
+    /* Very small screens */
+    @media (max-width: 380px) {
+      .letter {
+        font-size: clamp(36px, 14vw, 54px);
+      }
+      
+      .bolt {
+        width: 16px;
+        height: 27px;
+        margin: 0 2px;
+      }
+    }
+    
+    /*
+     * ═══════════════════════════════════════════════════════════════
+     * DARK MODE — Inverted Void
+     * ═══════════════════════════════════════════════════════════════
+     * Light letters emerge from darkness,
+     * like ribbon windows at night.
+     */
+    
+    /* Dark mode disabled - already dark by default */
+    
+    /*
+     * ═══════════════════════════════════════════════════════════════
+     * PRINT — The Permanent Record
+     * ═══════════════════════════════════════════════════════════════
+     */
+    
+    @media print {
+      body {
+        background: white;
+      }
+      
+      .letter {
+        color: black;
+      }
+      
+      .bolt-path {
+        fill: black;
+        animation: none;
+      }
+    }
+  </style>
 </head>
 <body>
-    <h1>L⚡I⚡G⚡H⚡T</h1>
+  <main>
+    <!-- 
+      Accessible title for screen readers.
+      The visual presentation is purely typographic sculpture.
+    -->
+    <h1>LIGHT</h1>
+    
+    <!-- 
+      ═══════════════════════════════════════════════════════════════
+      THE COMPOSITION
+      ═══════════════════════════════════════════════════════════════
+      
+      L ⚡ I ⚡ G ⚡ H ⚡ T
+      
+      Five letters. Four bolts. One word. Infinite light.
+      
+      The lightning bolts are constructed geometrically:
+      - Based on isoceles triangles
+      - 60° angles referencing equilateral forms
+      - Proportions derived from the letter height
+      - SVG paths for mathematical precision
+      
+      ═══════════════════════════════════════════════════════════════
+    -->
+    <div class="composition" role="img" aria-label="LIGHT, with lightning bolts between each letter">
+      
+      <!-- L -->
+      <span class="letter" aria-hidden="true">L</span>
+      
+      <!-- ⚡ 1 -->
+      <span class="bolt" aria-hidden="true">
+        <svg viewBox="0 0 32 56" xmlns="http://www.w3.org/2000/svg">
+          <!--
+            Lightning bolt geometry — Le Corbusier construction:
+            - Based on a 30-60-90 triangle grid
+            - Clean angular transitions
+            - Stroke weight proportional to letterforms
+            - The bolt as architectural element
+          -->
+          <path class="bolt-path" d="
+            M 20 0
+            L 6 24
+            L 14 24
+            L 4 56
+            L 28 22
+            L 18 22
+            L 28 0
+            Z
+          "/>
+        </svg>
+      </span>
+      
+      <!-- I -->
+      <span class="letter" aria-hidden="true">I</span>
+      
+      <!-- ⚡ 2 -->
+      <span class="bolt" aria-hidden="true">
+        <svg viewBox="0 0 32 56" xmlns="http://www.w3.org/2000/svg">
+          <path class="bolt-path" d="
+            M 20 0
+            L 6 24
+            L 14 24
+            L 4 56
+            L 28 22
+            L 18 22
+            L 28 0
+            Z
+          "/>
+        </svg>
+      </span>
+      
+      <!-- G -->
+      <span class="letter" aria-hidden="true">G</span>
+      
+      <!-- ⚡ 3 -->
+      <span class="bolt" aria-hidden="true">
+        <svg viewBox="0 0 32 56" xmlns="http://www.w3.org/2000/svg">
+          <path class="bolt-path" d="
+            M 20 0
+            L 6 24
+            L 14 24
+            L 4 56
+            L 28 22
+            L 18 22
+            L 28 0
+            Z
+          "/>
+        </svg>
+      </span>
+      
+      <!-- H -->
+      <span class="letter" aria-hidden="true">H</span>
+      
+      <!-- ⚡ 4 -->
+      <span class="bolt" aria-hidden="true">
+        <svg viewBox="0 0 32 56" xmlns="http://www.w3.org/2000/svg">
+          <path class="bolt-path" d="
+            M 20 0
+            L 6 24
+            L 14 24
+            L 4 56
+            L 28 22
+            L 18 22
+            L 28 0
+            Z
+          "/>
+        </svg>
+      </span>
+      
+      <!-- T -->
+      <span class="letter" aria-hidden="true">T</span>
+      
+    </div>
+  </main>
+  
+  <!--
+    ═══════════════════════════════════════════════════════════════════
+    
+    "The home should be the treasure chest of living."
+    — Le Corbusier
+    
+    This page is a treasure chest containing only one thing: light.
+    
+    ═══════════════════════════════════════════════════════════════════
+  -->
+  
+  <script>
+    // Animated favicon - pulses between charcoal and yellow
+    (function() {
+      const favicon = document.getElementById('favicon');
+      const charcoal = '%231A1A1A';
+      const yellow = '%23FFD93D';
+      let isYellow = false;
+      
+      function createFaviconSVG(color) {
+        return `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><path fill='${color}' d='M18 2L6 16h6L4 30l20-16h-8l8-12z'/></svg>`;
+      }
+      
+      // Smooth transition over 6 seconds (matching breath animation)
+      setInterval(() => {
+        isYellow = !isYellow;
+        favicon.href = createFaviconSVG(isYellow ? yellow : charcoal);
+      }, 3000); // Toggle every 3s (full cycle = 6s)
+    })();
+  </script>
 </body>
 </html>
