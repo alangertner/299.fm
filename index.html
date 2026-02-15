@@ -50,7 +50,7 @@ const letters='Light'.split('');
 letters.forEach((ch,i)=>{const s=document.createElement('span');s.textContent=ch;s.dataset.i=i;wordEl.appendChild(s)});
 const spans=wordEl.querySelectorAll('span');
 
-// --- Reduced motion ---
+// --- Reduced motion --- (still animate, just simpler)
 const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 if(reduced){spans[2].classList.add('glow-static')}
 
@@ -60,8 +60,7 @@ const lines=overlay.querySelectorAll('.line');
 document.getElementById('info-btn').onclick=()=>{overlay.classList.add('open');lines.forEach((l,i)=>{l.style.transitionDelay=(.15*i)+'s'})};
 document.getElementById('close-btn').onclick=()=>{overlay.classList.remove('open');lines.forEach(l=>{l.style.transitionDelay='0s'})};
 
-if(reduced) { /* stop here, no animation */ }
-else{
+{
 
 // --- Canvas ---
 const cvs=document.getElementById('bug');
@@ -292,7 +291,7 @@ function distToTarget(){
 // Start after brief pause
 setTimeout(()=>{bug.timer=0;requestAnimationFrame(update)},200);
 
-} // end reduced motion check
+} // end animation block
 </script>
 </body>
 </html>
