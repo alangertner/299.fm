@@ -3,453 +3,294 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Light — 299.fm</title>
-<meta name="description" content="299,792,458 metres per second.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&display=swap" rel="stylesheet">
+<title>299.fm</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300&display=swap" rel="stylesheet">
 <style>
-*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e}
-body{font-family:'Cormorant Garamond',serif;display:flex;align-items:center;justify-content:center;position:relative;transition:background 3s ease}
-canvas#rain{position:fixed;top:0;left:0;width:100%;height:100%;z-index:1;pointer-events:none}
-canvas#fx{position:fixed;top:0;left:0;width:100%;height:100%;z-index:3;pointer-events:none}
-#flash{position:fixed;top:0;left:0;width:100%;height:100%;z-index:4;background:#fff;opacity:0;pointer-events:none;transition:opacity .05s}
-#word{position:relative;z-index:2;font-size:clamp(4rem,14vw,11rem);font-weight:300;letter-spacing:.04em;color:transparent;user-select:none;display:flex;cursor:default}
-#word .letter{display:inline-block;position:relative;color:transparent;transition:color 2s ease,text-shadow 2s ease}
-#word .letter.lit{color:#FFD93D;text-shadow:0 0 40px rgba(255,217,61,.8),0 0 80px rgba(255,170,0,.4)}
-#word .letter.final{color:#2A2A28;text-shadow:0 0 0 transparent;transition:color 2s ease 0s,text-shadow 2s ease 0s}
-#word .letter.ghost{color:rgba(255,255,255,.03)}
-#info-btn{position:fixed;bottom:2rem;right:2rem;z-index:10;width:36px;height:36px;border-radius:50%;border:1px solid rgba(42,42,40,.25);background:transparent;color:#2A2A28;font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:400;cursor:pointer;opacity:0;transition:opacity .8s ease,border-color .3s,color .3s;display:flex;align-items:center;justify-content:center}
-#info-btn:hover{border-color:#2A2A28;color:#000}
-#info-btn.show{opacity:1}
-#overlay{position:fixed;top:0;left:0;width:100%;height:100%;z-index:20;background:rgba(245,242,236,.97);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .5s ease}
-#overlay.open{opacity:1;pointer-events:all}
-#overlay-content{text-align:center;font-family:'Cormorant Garamond',serif;font-weight:300;color:#2A2A28;font-size:clamp(1.1rem,3vw,1.6rem);line-height:2}
-#overlay-content .line{opacity:0;transform:translateY(12px);transition:opacity .6s ease,transform .6s ease}
-#overlay-content .line.reveal{opacity:1;transform:translateY(0)}
-#overlay-close{position:absolute;top:2rem;right:2rem;background:none;border:none;font-size:1.5rem;color:#2A2A28;cursor:pointer;font-family:'Cormorant Garamond',serif}
-@media print{
-  canvas,#flash,#info-btn,#overlay{display:none!important}
-  body{background:#fff!important}
-  #word .letter{color:#2A2A28!important;text-shadow:none!important}
-}
-@media (prefers-reduced-motion:reduce){
-  canvas{display:none!important}
-  #flash{display:none!important}
-}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;overflow:hidden}
+body{background:#F5F2EC;font-family:'Cormorant Garamond',serif;font-weight:300;color:#2A2A28;display:flex;align-items:center;justify-content:center}
+#word{font-size:clamp(4rem,12vw,9rem);letter-spacing:.04em;user-select:none;position:relative;z-index:1}
+#word span{display:inline-block;transition:color .4s,text-shadow .4s}
+#word span.glow{color:#FFD93D;text-shadow:0 0 18px rgba(255,217,61,.45)}
+canvas#bug{position:fixed;top:0;left:0;width:100%;height:100%;z-index:2;pointer-events:none}
+#info-btn{position:fixed;bottom:24px;right:28px;z-index:10;width:28px;height:28px;border-radius:50%;border:1px solid rgba(42,42,40,.25);background:transparent;color:#2A2A28;font-family:'Cormorant Garamond',serif;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:.4;transition:opacity .3s}
+#info-btn:hover{opacity:.8}
+#overlay{position:fixed;inset:0;background:rgba(245,242,236,.97);z-index:20;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .5s}
+#overlay.open{opacity:1;pointer-events:auto}
+#overlay-inner{text-align:center;font-size:clamp(1.1rem,3vw,1.6rem);line-height:2.2}
+#overlay-inner .line{opacity:0;transform:translateY(8px);transition:opacity .6s,transform .6s}
+#overlay.open .line{opacity:1;transform:translateY(0)}
+#close-btn{position:absolute;top:24px;right:28px;background:none;border:none;font-size:24px;color:#2A2A28;cursor:pointer;opacity:.4;font-family:'Cormorant Garamond',serif}
+#close-btn:hover{opacity:.8}
+#interact-layer{position:fixed;inset:0;z-index:3}
+@media(prefers-reduced-motion:reduce){canvas#bug{display:none}#word span.glow-static{color:#FFD93D;text-shadow:0 0 18px rgba(255,217,61,.45)}}
 </style>
 </head>
 <body>
-<canvas id="rain"></canvas>
-<canvas id="fx"></canvas>
-<div id="flash"></div>
-<div id="word"><span class="letter">L</span><span class="letter">i</span><span class="letter">g</span><span class="letter">h</span><span class="letter">t</span></div>
-<button id="info-btn" aria-label="Info">(i)</button>
+<div id="word"></div>
+<canvas id="bug"></canvas>
+<div id="interact-layer"></div>
+<button id="info-btn" aria-label="Info">i</button>
 <div id="overlay">
-  <button id="overlay-close" aria-label="Close">×</button>
-  <div id="overlay-content">
-    <div class="line">299,792,458 metres per second.</div>
-    <div class="line"><br></div>
-    <div class="line">Be Present</div>
-    <div class="line">Be Bold</div>
-    <div class="line">Be Together</div>
-    <div class="line"><br></div>
-    <div class="line">⚡</div>
-  </div>
+<button id="close-btn" aria-label="Close">×</button>
+<div id="overlay-inner">
+<div class="line">299,792,458 metres per second.</div>
+<div class="line"><br></div>
+<div class="line">Be Present</div>
+<div class="line">Be Bold</div>
+<div class="line">Be Together</div>
+<div class="line"><br></div>
+<div class="line">⚡</div>
+</div>
 </div>
 <script>
-(function(){
-'use strict';
+// --- Word setup ---
+const wordEl=document.getElementById('word');
+const letters='Light'.split('');
+letters.forEach((ch,i)=>{const s=document.createElement('span');s.textContent=ch;s.dataset.i=i;wordEl.appendChild(s)});
+const spans=wordEl.querySelectorAll('span');
 
-const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-const seen = sessionStorage.getItem('299fm-seen');
-const skipIntro = reducedMotion || seen;
+// --- Reduced motion ---
+const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+if(reduced){spans[2].classList.add('glow-static')}
 
-const rainC = document.getElementById('rain');
-const fxC = document.getElementById('fx');
-const rCtx = rainC.getContext('2d');
-const fCtx = fxC.getContext('2d');
-const flash = document.getElementById('flash');
-const wordEl = document.getElementById('word');
-const letters = wordEl.querySelectorAll('.letter');
-const infoBtn = document.getElementById('info-btn');
-const overlay = document.getElementById('overlay');
-const overlayClose = document.getElementById('overlay-close');
-const overlayLines = document.querySelectorAll('#overlay-content .line');
+// --- Info panel ---
+const overlay=document.getElementById('overlay');
+const lines=overlay.querySelectorAll('.line');
+document.getElementById('info-btn').onclick=()=>{overlay.classList.add('open');lines.forEach((l,i)=>{l.style.transitionDelay=(.15*i)+'s'})};
+document.getElementById('close-btn').onclick=()=>{overlay.classList.remove('open');lines.forEach(l=>{l.style.transitionDelay='0s'})};
 
-let W, H, dpr;
-function resize(){
-  dpr = window.devicePixelRatio || 1;
-  W = window.innerWidth; H = window.innerHeight;
-  rainC.width = fxC.width = W * dpr;
-  rainC.height = fxC.height = H * dpr;
-  rCtx.setTransform(dpr,0,0,dpr,0,0);
-  fCtx.setTransform(dpr,0,0,dpr,0,0);
+if(reduced) { /* stop here, no animation */ }
+else{
+
+// --- Canvas ---
+const cvs=document.getElementById('bug');
+const ctx=cvs.getContext('2d');
+let W,H;
+function resize(){W=cvs.width=window.innerWidth;H=cvs.height=window.innerHeight}
+resize();window.addEventListener('resize',resize);
+
+// --- Bug state ---
+const bug={
+  x:-40,y:H/2,
+  tx:W/2,ty:H/2,
+  vx:0,vy:0,
+  phase:'enter', // enter, fly, land, hover, startle
+  timer:0,
+  wingPhase:0,
+  glow:1,
+  landedOn:-1,
+  facing:1 // 1=right,-1=left
+};
+
+// Letter positions
+function getLetterRects(){
+  const rects=[];
+  spans.forEach(s=>{const r=s.getBoundingClientRect();rects.push({x:r.left+r.width/2,y:r.top+r.height*.35,w:r.width,h:r.height})});
+  return rects;
 }
-resize();
-window.addEventListener('resize', resize);
 
-// --- RAIN ---
-const MAX_DROPS = 400;
-const drops = [];
-function makeDrop(){
-  const depth = Math.random();
-  return {
-    x: Math.random() * W * 1.2 - W * 0.1,
-    y: Math.random() * -H,
-    speed: 8 + depth * 14,
-    len: 10 + depth * 25,
-    thick: 0.5 + depth * 1.5,
-    alpha: 0.15 + depth * 0.35,
-    depth
-  };
+// Mouse/touch tracking
+let mouseX=-9999,mouseY=-9999;
+const interactLayer=document.getElementById('interact-layer');
+interactLayer.addEventListener('mousemove',e=>{mouseX=e.clientX;mouseY=e.clientY});
+interactLayer.addEventListener('touchstart',e=>{const t=e.touches[0];mouseX=t.clientX;mouseY=t.clientY;setTimeout(()=>{mouseX=-9999;mouseY=-9999},600)},{passive:true});
+
+function randRange(a,b){return a+Math.random()*(b-a)}
+
+function pickTarget(){
+  const rects=getLetterRects();
+  // 40% chance land on letter, 60% random hover
+  if(Math.random()<.4&&rects.length){
+    const i=Math.floor(Math.random()*rects.length);
+    bug.landedOn=i;
+    return{x:rects[i].x,y:rects[i].y-10,land:true,letterIdx:i};
+  }
+  bug.landedOn=-1;
+  return{x:randRange(W*.15,W*.85),y:randRange(H*.2,H*.8),land:false,letterIdx:-1};
 }
-for(let i=0;i<MAX_DROPS;i++) drops.push(makeDrop());
 
-let rainAlpha = 1;
-function drawRain(dt){
-  rCtx.clearRect(0,0,W,H);
-  if(rainAlpha <= 0) return;
-  const wind = 2;
-  for(let i=0;i<drops.length;i++){
-    const d = drops[i];
-    d.y += d.speed * dt * 60;
-    d.x += wind * d.depth * dt * 60;
-    if(d.y > H + 20){
-      d.y = Math.random() * -100;
-      d.x = Math.random() * W * 1.2 - W * 0.1;
-    }
-    rCtx.beginPath();
-    rCtx.moveTo(d.x, d.y);
-    rCtx.lineTo(d.x + wind * d.depth * 2, d.y + d.len);
-    rCtx.strokeStyle = `rgba(174,194,224,${d.alpha * rainAlpha})`;
-    rCtx.lineWidth = d.thick;
-    rCtx.stroke();
+function startFly(){
+  const t=pickTarget();
+  bug.tx=t.x;bug.ty=t.y;
+  bug.phase=t.land?'flyToLand':'fly';
+  bug.timer=0;
+  bug.targetLetter=t.letterIdx;
+}
+
+function startle(){
+  bug.phase='startle';
+  bug.timer=0;
+  // fly away from mouse
+  const angle=Math.atan2(bug.y-mouseY,bug.x-mouseX);
+  bug.tx=bug.x+Math.cos(angle)*randRange(150,300);
+  bug.ty=bug.y+Math.sin(angle)*randRange(100,200);
+  bug.tx=Math.max(40,Math.min(W-40,bug.tx));
+  bug.ty=Math.max(40,Math.min(H-40,bug.ty));
+  bug.landedOn=-1;
+  // unglow letters
+  spans.forEach(s=>s.classList.remove('glow'));
+}
+
+// Trail particles
+const trail=[];
+
+// --- Draw bug ---
+function drawBug(dt){
+  const s=20; // size
+  const cx=bug.x,cy=bug.y;
+  const flying=bug.phase!=='land';
+  const glowAmt=flying?(.7+.3*Math.sin(Date.now()*.005)):(.3+.15*Math.sin(Date.now()*.003));
+
+  ctx.save();
+  ctx.translate(cx,cy);
+  ctx.scale(bug.facing,1);
+
+  // Glow aura
+  const grad=ctx.createRadialGradient(3,-1,2,3,-1,s*1.2);
+  grad.addColorStop(0,`rgba(255,217,61,${glowAmt*.5})`);
+  grad.addColorStop(1,'rgba(255,217,61,0)');
+  ctx.fillStyle=grad;
+  ctx.beginPath();ctx.arc(3,-1,s*1.2,0,Math.PI*2);ctx.fill();
+
+  // Wings (when flying)
+  if(flying){
+    bug.wingPhase+=dt*25;
+    const wAng=Math.sin(bug.wingPhase)*.4;
+    ctx.save();
+    ctx.globalAlpha=.18;
+    ctx.fillStyle='#2A2A28';
+    // top wing
+    ctx.save();ctx.translate(-2,-4);ctx.rotate(-.6+wAng);
+    ctx.beginPath();ctx.ellipse(0,-5,3.5,8,0,0,Math.PI*2);ctx.fill();
+    ctx.restore();
+    // bottom wing
+    ctx.save();ctx.translate(-2,-2);ctx.rotate(-.3-wAng*.7);
+    ctx.beginPath();ctx.ellipse(0,-4,3,7,0,0,Math.PI*2);ctx.fill();
+    ctx.restore();
+    ctx.restore();
+  }else{
+    // Folded wings
+    ctx.save();ctx.globalAlpha=.1;ctx.fillStyle='#2A2A28';
+    ctx.beginPath();ctx.ellipse(-2,-6,2.5,7,-.15,0,Math.PI*2);ctx.fill();
+    ctx.restore();
+  }
+
+  // Body
+  ctx.fillStyle='#2A2A28';
+  ctx.beginPath();ctx.ellipse(0,0,3.5,6,.1,0,Math.PI*2);ctx.fill();
+
+  // Abdomen glow
+  ctx.fillStyle=`rgba(255,217,61,${glowAmt})`;
+  ctx.beginPath();ctx.ellipse(4,1,3,4,0,0,Math.PI*2);ctx.fill();
+
+  // Antennae
+  ctx.strokeStyle='#2A2A28';ctx.lineWidth=.6;
+  ctx.beginPath();ctx.moveTo(-3,-5);ctx.quadraticCurveTo(-6,-12,-8,-14);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(-2,-5);ctx.quadraticCurveTo(-3,-13,-5,-15);ctx.stroke();
+
+  ctx.restore();
+
+  // Trail
+  if(flying&&Math.random()<.3){
+    trail.push({x:cx+bug.facing*5,y:cy+1,a:.3,life:1});
   }
 }
 
-// --- LIGHTNING ---
-function genBolt(x1,y1,x2,y2,displace,gen){
-  if(displace < 4){
-    return [{x:x1,y:y1},{x:x2,y:y2}];
-  }
-  const midX = (x1+x2)/2 + (Math.random()-.5)*displace;
-  const midY = (y1+y2)/2 + (Math.random()-.5)*displace;
-  const left = genBolt(x1,y1,midX,midY,displace/2,gen+1);
-  const right = genBolt(midX,midY,x2,y2,displace/2,gen+1);
-  const pts = left.concat(right.slice(1));
-  // branch
-  if(gen < 3 && Math.random() < 0.35){
-    const angle = Math.atan2(y2-y1,x2-x1) + (Math.random()-.5)*1.2;
-    const bLen = displace * (0.5 + Math.random()*0.5);
-    const branch = genBolt(midX,midY, midX+Math.cos(angle)*bLen, midY+Math.sin(angle)*bLen, displace/3, gen+1);
-    pts._branches = pts._branches || [];
-    pts._branches.push(branch);
-  }
-  return pts;
-}
-
-function drawBoltPath(ctx, pts, alpha, width){
-  ctx.beginPath();
-  ctx.moveTo(pts[0].x, pts[0].y);
-  for(let i=1;i<pts.length;i++) ctx.lineTo(pts[i].x, pts[i].y);
-  ctx.strokeStyle = `rgba(200,220,255,${alpha})`;
-  ctx.lineWidth = width;
-  ctx.shadowColor = 'rgba(150,180,255,0.8)';
-  ctx.shadowBlur = 20;
-  ctx.stroke();
-  ctx.shadowBlur = 0;
-  if(pts._branches){
-    for(const b of pts._branches) drawBoltPath(ctx, b, alpha*0.6, width*0.5);
+function drawTrail(){
+  for(let i=trail.length-1;i>=0;i--){
+    const p=trail[i];
+    p.life-=.008;p.a=p.life*.25;
+    if(p.life<=0){trail.splice(i,1);continue}
+    ctx.fillStyle=`rgba(255,217,61,${p.a})`;
+    ctx.beginPath();ctx.arc(p.x,p.y,1.5*p.life,0,Math.PI*2);ctx.fill();
   }
 }
 
-let activeBolts = [];
-function triggerBolt(targetX, targetY){
-  const startX = targetX + (Math.random()-.5)*W*0.3;
-  const pts = genBolt(startX, -10, targetX, targetY || H*0.5, W*0.35, 0);
-  activeBolts.push({pts, birth: performance.now(), dur: 150 + Math.random()*100});
-  // flash
-  flash.style.transition = 'none';
-  flash.style.opacity = 0.7 + Math.random()*0.3;
-  requestAnimationFrame(()=>{
-    flash.style.transition = 'opacity .3s ease';
-    flash.style.opacity = 0;
-  });
-}
+// --- Update ---
+let lastTime=0;
+function update(now){
+  const dt=Math.min((now-(lastTime||now))/1000,.05);
+  lastTime=now;
 
-function drawBolts(now){
-  for(let i=activeBolts.length-1;i>=0;i--){
-    const b = activeBolts[i];
-    const age = now - b.birth;
-    if(age > b.dur + 200){ activeBolts.splice(i,1); continue; }
-    const alpha = age < b.dur ? 1 : 1 - (age - b.dur)/200;
-    drawBoltPath(fCtx, b.pts, Math.max(0,alpha), 2);
-    // glow pass
-    drawBoltPath(fCtx, b.pts, Math.max(0,alpha)*0.3, 6);
+  ctx.clearRect(0,0,W,H);
+
+  // Check mouse proximity for startle
+  if(bug.phase!=='startle'&&bug.phase!=='enter'){
+    const dx=bug.x-mouseX,dy=bug.y-mouseY;
+    if(Math.sqrt(dx*dx+dy*dy)<70){startle()}
   }
-}
 
-// --- FIREFLIES ---
-const flies = [];
-function initFireflies(){
-  for(let i=0;i<30;i++){
-    flies.push({
-      x: Math.random()*W, y: Math.random()*H,
-      vx: (Math.random()-.5)*0.3, vy: (Math.random()-.5)*0.3,
-      r: 1.5+Math.random()*2, phase: Math.random()*Math.PI*2,
-      speed: 0.5+Math.random()*1.5
-    });
-  }
-}
-let firefliesAlpha = 0;
-function drawFireflies(now){
-  if(firefliesAlpha <= 0) return;
-  for(const f of flies){
-    f.x += f.vx; f.y += f.vy;
-    if(f.x<0)f.x=W; if(f.x>W)f.x=0;
-    if(f.y<0)f.y=H; if(f.y>H)f.y=0;
-    const glow = (Math.sin(now/1000*f.speed + f.phase)+1)/2;
-    const a = glow * 0.5 * firefliesAlpha;
-    fCtx.beginPath();
-    fCtx.arc(f.x, f.y, f.r, 0, Math.PI*2);
-    fCtx.fillStyle = `rgba(255,217,61,${a})`;
-    fCtx.shadowColor = 'rgba(255,217,61,0.6)';
-    fCtx.shadowBlur = 12;
-    fCtx.fill();
-    fCtx.shadowBlur = 0;
-  }
-}
-
-// --- CURSOR PARTICLES ---
-const particles = [];
-let mouseX = -100, mouseY = -100;
-function spawnParticles(x,y,count,burst){
-  for(let i=0;i<count;i++){
-    const angle = Math.random()*Math.PI*2;
-    const speed = burst ? 1+Math.random()*3 : 0.2+Math.random()*0.8;
-    particles.push({
-      x, y, vx: Math.cos(angle)*speed, vy: Math.sin(angle)*speed,
-      life: 1, decay: 0.01+Math.random()*0.02,
-      r: 1+Math.random()*2
-    });
-  }
-}
-function drawParticles(){
-  for(let i=particles.length-1;i>=0;i--){
-    const p = particles[i];
-    p.x += p.vx; p.y += p.vy; p.life -= p.decay;
-    if(p.life<=0){particles.splice(i,1);continue;}
-    fCtx.beginPath();
-    fCtx.arc(p.x,p.y,p.r*p.life,0,Math.PI*2);
-    fCtx.fillStyle=`rgba(255,217,61,${p.life*0.6})`;
-    fCtx.fill();
-  }
-}
-
-// --- LETTER GLOW ON HOVER ---
-function letterProximity(){
-  if(stage < 4) return;
-  const wordRect = wordEl.getBoundingClientRect();
-  letters.forEach(l => {
-    const r = l.getBoundingClientRect();
-    const cx = r.left + r.width/2, cy = r.top + r.height/2;
-    const dist = Math.hypot(mouseX - cx, mouseY - cy);
-    const glow = Math.max(0, 1 - dist / 200);
-    if(glow > 0){
-      l.style.textShadow = `0 0 ${20+glow*40}px rgba(255,217,61,${glow*0.5})`;
-    } else {
-      l.style.textShadow = '';
-    }
-  });
-}
-
-// --- SUN BEAMS ---
-let beamsAlpha = 0;
-function drawBeams(now){
-  if(beamsAlpha <= 0) return;
-  const cx = W*0.5, cy = H*0.25;
-  const count = 8;
-  for(let i=0;i<count;i++){
-    const angle = (i/count)*Math.PI*2 + now/8000;
-    const len = H*0.8;
-    const spread = 0.08;
-    fCtx.beginPath();
-    fCtx.moveTo(cx,cy);
-    fCtx.lineTo(cx+Math.cos(angle-spread)*len, cy+Math.sin(angle-spread)*len);
-    fCtx.lineTo(cx+Math.cos(angle+spread)*len, cy+Math.sin(angle+spread)*len);
-    fCtx.closePath();
-    fCtx.fillStyle=`rgba(255,217,61,${0.03*beamsAlpha})`;
-    fCtx.fill();
-  }
-}
-
-// --- STAGE MANAGEMENT ---
-let stage = 0;
-let startTime;
-let emberPhase = 0;
-
-function setBackground(color){
-  document.body.style.background = color;
-}
-
-function goStage4(){
-  stage = 4;
-  rainAlpha = 0;
-  setBackground('#F5F2EC');
-  letters.forEach(l => { l.classList.remove('lit','ghost'); l.classList.add('final'); l.style.textShadow=''; });
-  infoBtn.classList.add('show');
-  firefliesAlpha = 1;
-  beamsAlpha = 1;
-  initFireflies();
-}
-
-if(skipIntro){
-  goStage4();
-}
-
-// --- EVENTS ---
-document.addEventListener('mousemove', e => {
-  mouseX = e.clientX; mouseY = e.clientY;
-  if(stage >= 4) spawnParticles(e.clientX, e.clientY, 1, false);
-});
-document.addEventListener('click', e => {
-  if(stage >= 4 && e.target !== infoBtn && !overlay.contains(e.target)){
-    spawnParticles(e.clientX, e.clientY, 20, true);
-  }
-});
-document.addEventListener('touchmove', e => {
-  const t = e.touches[0];
-  mouseX = t.clientX; mouseY = t.clientY;
-  if(stage >= 4) spawnParticles(t.clientX, t.clientY, 1, false);
-}, {passive:true});
-
-infoBtn.addEventListener('click', () => {
-  overlay.classList.add('open');
-  overlayLines.forEach((l,i) => setTimeout(() => l.classList.add('reveal'), 150*i));
-});
-overlayClose.addEventListener('click', () => {
-  overlay.classList.remove('open');
-  overlayLines.forEach(l => l.classList.remove('reveal'));
-});
-overlay.addEventListener('click', e => {
-  if(e.target === overlay){
-    overlay.classList.remove('open');
-    overlayLines.forEach(l => l.classList.remove('reveal'));
-  }
-});
-
-// --- THUNDER SHAKE ---
-let shakeUntil = 0;
-function applyShake(now){
-  if(now < shakeUntil){
-    const intensity = 2;
-    const ox = (Math.random()-.5)*intensity*2;
-    const oy = (Math.random()-.5)*intensity*2;
-    document.body.style.transform = `translate(${ox}px,${oy}px)`;
-  } else {
-    document.body.style.transform = '';
-  }
-}
-
-// --- MAIN LOOP ---
-let lastFrame = 0;
-function loop(now){
-  requestAnimationFrame(loop);
-  const dt = Math.min((now - lastFrame)/1000, 0.05);
-  lastFrame = now;
-
-  if(!startTime && !skipIntro) startTime = now;
-  const elapsed = skipIntro ? 99 : (now - startTime)/1000;
-
-  fCtx.clearRect(0,0,W,H);
-
-  if(!skipIntro){
-    // Stage transitions
-    if(stage === 0 && elapsed >= 0){
-      stage = 1;
-      letters.forEach(l => l.classList.add('ghost'));
-      // Schedule thunder shakes
-      setTimeout(()=>{ shakeUntil = performance.now()+200; }, 1500);
-      setTimeout(()=>{ shakeUntil = performance.now()+150; }, 3000);
-    }
-    if(stage === 1 && elapsed >= 4){
-      stage = 2;
-      // Lightning sequence
-      const wordRect = wordEl.getBoundingClientRect();
-      const targetY = wordRect.top + wordRect.height/2;
-      setTimeout(() => triggerBolt(W*0.3, H*0.6), 0);
-      setTimeout(() => {
-        triggerBolt(W*0.7, H*0.5);
-        shakeUntil = performance.now()+100;
-      }, 800);
-      setTimeout(() => {
-        // Final bolt strikes "Light"
-        triggerBolt(wordRect.left + wordRect.width/2, targetY);
-        shakeUntil = performance.now()+200;
-        // Ignite letters sequentially
-        letters.forEach((l,i) => {
-          setTimeout(() => {
-            l.classList.remove('ghost');
-            l.classList.add('lit');
-          }, i * 120);
-        });
-      }, 1800);
-    }
-    if(stage === 2 && elapsed >= 7){
-      stage = 3;
-      // Begin sky lightening
-    }
-    if(stage === 3){
-      const t = Math.min((elapsed - 7)/3, 1); // 0→1 over 3s
-      rainAlpha = 1 - t;
-      // Interpolate background
-      const r = Math.round(26 + (245-26)*t);
-      const g = Math.round(26 + (242-26)*t);
-      const b = Math.round(46 + (236-46)*t);
-      setBackground(`rgb(${r},${g},${b})`);
-      // Ember glow
-      emberPhase += dt * 3;
-      const ember = 0.3 + Math.sin(emberPhase)*0.2;
-      letters.forEach(l => {
-        if(l.classList.contains('lit')){
-          l.style.textShadow = `0 0 ${30+ember*20}px rgba(255,217,61,${0.5+ember*0.3}), 0 0 ${60+ember*30}px rgba(255,170,0,${0.2+ember*0.2})`;
+  // State machine
+  switch(bug.phase){
+    case 'enter':
+      bug.timer+=dt;
+      if(bug.timer<1.5){break}// wait
+      bug.tx=W/2;bug.ty=H/2-20;
+      moveBug(dt,2);
+      if(distToTarget()<5){startFly()}
+      break;
+    case 'fly':
+    case 'flyToLand':
+    case 'startle':
+      moveBug(dt,bug.phase==='startle'?4:1.8);
+      if(distToTarget()<(bug.phase==='flyToLand'?4:15)){
+        if(bug.phase==='flyToLand'){
+          bug.phase='land';bug.timer=0;
+          if(bug.targetLetter>=0)spans[bug.targetLetter].classList.add('glow');
+        }else{
+          bug.phase='hover';bug.timer=0;
         }
-      });
-      beamsAlpha = t * 0.5;
-      firefliesAlpha = t;
-      if(t >= 1){
-        stage = 4;
-        letters.forEach(l => { l.classList.remove('lit'); l.classList.add('final'); l.style.textShadow=''; });
-        infoBtn.classList.add('show');
-        sessionStorage.setItem('299fm-seen','1');
-        initFireflies();
-        firefliesAlpha = 1;
-        beamsAlpha = 1;
       }
-    }
-    if(stage < 3){
-      // Storm sky gradient with subtle animation
-      const pulse = Math.sin(now/2000)*0.02;
-      setBackground(`rgb(${Math.round(26+pulse*100)},${Math.round(26+pulse*50)},${Math.round(46+pulse*50)})`);
-    }
+      break;
+    case 'hover':
+      // gentle bob
+      bug.y+=Math.sin(now*.002)*.15;
+      bug.x+=Math.sin(now*.0013)*.1;
+      bug.timer+=dt;
+      if(bug.timer>randRange(2,5)){startFly()}
+      break;
+    case 'land':
+      // sit still, pulse
+      bug.timer+=dt;
+      if(bug.timer>randRange(2.5,5)){
+        if(bug.targetLetter>=0)spans[bug.targetLetter].classList.remove('glow');
+        startFly();
+      }
+      break;
   }
 
-  // Draw layers
-  drawRain(dt);
-  drawBeams(now);
-  drawBolts(now);
-  drawFireflies(now);
-  drawParticles();
-  applyShake(now);
-  letterProximity();
+  // Face direction of movement
+  if(Math.abs(bug.vx)>.1)bug.facing=bug.vx>0?1:-1;
+
+  drawTrail();
+  drawBug(dt);
+  requestAnimationFrame(update);
 }
 
-if(!skipIntro) initFireflies();
-requestAnimationFrame(loop);
+function moveBug(dt,speed){
+  const dx=bug.tx-bug.x,dy=bug.ty-bug.y;
+  const d=Math.sqrt(dx*dx+dy*dy)||1;
+  // Add jitter for organic feel
+  const jx=(Math.random()-.5)*40*dt;
+  const jy=(Math.random()-.5)*40*dt;
+  const ax=(dx/d)*speed*60+jx;
+  const ay=(dy/d)*speed*60+jy;
+  bug.vx+=(ax-bug.vx)*dt*2;
+  bug.vy+=(ay-bug.vy)*dt*2;
+  bug.x+=bug.vx*dt;
+  bug.y+=bug.vy*dt;
+}
 
-})();
+function distToTarget(){
+  const dx=bug.tx-bug.x,dy=bug.ty-bug.y;
+  return Math.sqrt(dx*dx+dy*dy);
+}
+
+// Start after brief pause
+setTimeout(()=>{bug.timer=0;requestAnimationFrame(update)},200);
+
+} // end reduced motion check
 </script>
 </body>
 </html>
