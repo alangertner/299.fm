@@ -99,17 +99,7 @@
             color: #1A1A18;
         }
 
-        /* Wandering words */
-        .wanderer {
-            position: fixed;
-            font-family: 'Cormorant Garamond', serif;
-            font-weight: 300;
-            font-style: italic;
-            pointer-events: none;
-            z-index: 4;
-            opacity: 0;
-            white-space: nowrap;
-        }
+        /* Wandering words - disabled */
 
         /* Firefly canvas */
         canvas#fireflies {
@@ -237,9 +227,9 @@
         <div class="content">
             <span class="speed">299,792,458 metres per second.</span>
             <div class="lines">
-                <span>the speed of light</span>
-                <span>the speed of thought</span>
-                <span>the speed of connection</span>
+                <span>Be Present</span>
+                <span>Be Bold</span>
+                <span>Be Together</span>
                 <span class="bolt">⚡</span>
             </div>
         </div>
@@ -350,44 +340,7 @@
             }
         });
 
-        // ---- WANDERING WORDS ----
-        const words = ['luminance', 'photon', 'aurora', 'radiance', 'spark', 'glow', 'prism', 'dawn', 'shimmer', 'ember', 'flicker', 'blaze'];
-        const wanderers = [];
-        function spawnWord() {
-            if (wanderers.length >= 3) return;
-            const el = document.createElement('div');
-            el.className = 'wanderer';
-            el.textContent = words[Math.floor(Math.random() * words.length)];
-            el.style.fontSize = (0.8 + Math.random() * 0.6) + 'rem';
-            document.body.appendChild(el);
-            const edge = Math.floor(Math.random() * 4);
-            let x, y, vx, vy;
-            if (edge === 0) { x = -100; y = Math.random() * H; vx = 0.2 + Math.random() * 0.3; vy = (Math.random() - 0.5) * 0.2; }
-            else if (edge === 1) { x = W + 100; y = Math.random() * H; vx = -(0.2 + Math.random() * 0.3); vy = (Math.random() - 0.5) * 0.2; }
-            else if (edge === 2) { x = Math.random() * W; y = -50; vx = (Math.random() - 0.5) * 0.2; vy = 0.2 + Math.random() * 0.3; }
-            else { x = Math.random() * W; y = H + 50; vx = (Math.random() - 0.5) * 0.2; vy = -(0.2 + Math.random() * 0.3); }
-            wanderers.push({ el, x, y, vx, vy, life: 0, maxLife: 400 + Math.random() * 300 });
-        }
-        setInterval(spawnWord, 5000 + Math.random() * 5000);
-        setTimeout(spawnWord, 4000);
-
-        function updateWanderers() {
-            for (let i = wanderers.length - 1; i >= 0; i--) {
-                const w = wanderers[i];
-                w.x += w.vx;
-                w.y += w.vy;
-                w.life++;
-                const fadeIn = Math.min(w.life / 60, 1);
-                const fadeOut = Math.max((w.maxLife - w.life) / 60, 0);
-                const alpha = Math.min(fadeIn, fadeOut) * 0.15;
-                w.el.style.transform = `translate(${w.x}px, ${w.y}px)`;
-                w.el.style.opacity = alpha;
-                if (w.life > w.maxLife) {
-                    w.el.remove();
-                    wanderers.splice(i, 1);
-                }
-            }
-        }
+        // No wandering words
 
         // ---- MAIN RENDER LOOP ----
         function render() {
@@ -450,7 +403,6 @@
             }
             if (particles.length > 300) particles.splice(0, particles.length - 300);
 
-            updateWanderers();
             requestAnimationFrame(render);
         }
         requestAnimationFrame(render);
