@@ -50,9 +50,8 @@ const letters='Light'.split('');
 letters.forEach((ch,i)=>{const s=document.createElement('span');s.textContent=ch;s.dataset.i=i;wordEl.appendChild(s)});
 const spans=wordEl.querySelectorAll('span');
 
-// --- Reduced motion --- (still animate, just simpler)
+// --- Reduced motion detection (no longer kills animation) ---
 const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-if(reduced){spans[2].classList.add('glow-static')}
 
 // --- Info panel ---
 const overlay=document.getElementById('overlay');
