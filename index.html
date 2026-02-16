@@ -4,103 +4,35 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>299.fm</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,900&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{width:100%;height:100%;overflow:hidden}
-body{background:#F5F2EC;color:#2A2A28;display:flex;align-items:center;justify-content:center;font-family:Georgia,serif}
-#word{user-select:none;position:relative;z-index:1;display:flex;align-items:baseline}
-/* Each letter is an SVG container for glow targeting */
-#word .letter{display:inline-block;transition:filter .4s}
-#word .letter.glow{filter:drop-shadow(0 0 18px rgba(255,217,61,.55))}
-#word .letter.glow path,#word .letter.glow line{stroke:#FFD93D;fill:#FFD93D}
+body{background:#F5F2EC;font-family:'Bodoni Moda',serif;font-weight:900;color:#2A2A28;display:flex;align-items:center;justify-content:center}
+#word{font-size:clamp(4rem,12vw,9rem);letter-spacing:.04em;user-select:none;position:relative;z-index:1}
+#word span{display:inline-block;transition:color .4s,text-shadow .4s}
+#word span.glow{color:#FFD93D;text-shadow:0 0 18px rgba(255,217,61,.45)}
+/* Custom g: clip the descender loop, add straight hairline */
+#word .g-wrap{position:relative;display:inline-block}
+#word .g-char{display:inline-block;clip-path:inset(0 0 32% 0)}
+#word .g-line{position:absolute;bottom:0;width:1.5px;height:38%;background:#2A2A28;/* positioned at the right stem of the g */right:0.04em;transform:translateY(28%)}
+#word .g-wrap.glow .g-char{color:#FFD93D;text-shadow:0 0 18px rgba(255,217,61,.45)}
+#word .g-wrap.glow .g-line{background:#FFD93D;box-shadow:0 0 18px rgba(255,217,61,.45)}
 canvas#bug{position:fixed;top:0;left:0;width:100%;height:100%;z-index:2;pointer-events:none}
-#info-btn{position:fixed;bottom:24px;right:28px;z-index:10;width:28px;height:28px;border-radius:50%;border:1px solid rgba(42,42,40,.25);background:transparent;color:#2A2A28;font-family:Georgia,serif;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:.4;transition:opacity .3s}
+#info-btn{position:fixed;bottom:24px;right:28px;z-index:10;width:28px;height:28px;border-radius:50%;border:1px solid rgba(42,42,40,.25);background:transparent;color:#2A2A28;font-family:'Bodoni Moda',serif;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:.4;transition:opacity .3s}
 #info-btn:hover{opacity:.8}
 #overlay{position:fixed;inset:0;background:rgba(245,242,236,.97);z-index:20;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .5s}
 #overlay.open{opacity:1;pointer-events:auto}
-#overlay-inner{text-align:center;font-size:clamp(1.1rem,3vw,1.6rem);line-height:2.2;font-family:Georgia,serif}
+#overlay-inner{text-align:center;font-family:'Bodoni Moda',serif;font-weight:400;font-size:clamp(1.1rem,3vw,1.6rem);line-height:2.2}
 #overlay-inner .line{opacity:0;transform:translateY(8px);transition:opacity .6s,transform .6s}
 #overlay.open .line{opacity:1;transform:translateY(0)}
-#close-btn{position:absolute;top:24px;right:28px;background:none;border:none;font-size:24px;color:#2A2A28;cursor:pointer;opacity:.4;font-family:Georgia,serif}
+#close-btn{position:absolute;top:24px;right:28px;background:none;border:none;font-size:24px;color:#2A2A28;cursor:pointer;opacity:.4;font-family:'Bodoni Moda',serif}
 #close-btn:hover{opacity:.8}
 #interact-layer{position:fixed;inset:0;z-index:3}
 </style>
 </head>
 <body>
-<div id="word">
-<!-- l - Bodoni style: thick vertical, hairline serifs -->
-<div class="letter" data-i="0">
-<svg viewBox="0 0 50 120" style="height:clamp(5rem,14vw,11rem);width:auto">
-  <line x1="22" y1="8" x2="22" y2="100" stroke="#2A2A28" stroke-width="8" stroke-linecap="butt"/>
-  <!-- top serif -->
-  <line x1="12" y1="8" x2="32" y2="8" stroke="#2A2A28" stroke-width="1.2"/>
-  <!-- bottom serif -->
-  <line x1="10" y1="100" x2="38" y2="100" stroke="#2A2A28" stroke-width="1.2"/>
-</svg>
-</div>
-
-<!-- i - thick stem, hairline serifs, round dot -->
-<div class="letter" data-i="1">
-<svg viewBox="0 0 50 120" style="height:clamp(5rem,14vw,11rem);width:auto">
-  <!-- dot -->
-  <circle cx="25" cy="28" r="5" fill="#2A2A28"/>
-  <!-- stem -->
-  <line x1="25" y1="42" x2="25" y2="100" stroke="#2A2A28" stroke-width="8" stroke-linecap="butt"/>
-  <!-- top serif -->
-  <line x1="15" y1="42" x2="35" y2="42" stroke="#2A2A28" stroke-width="1.2"/>
-  <!-- bottom serif -->
-  <line x1="13" y1="100" x2="37" y2="100" stroke="#2A2A28" stroke-width="1.2"/>
-</svg>
-</div>
-
-<!-- g - Bodoni bowl + STRAIGHT HAIRLINE descender (no loop) — the #66 move -->
-<div class="letter" data-i="2">
-<svg viewBox="0 0 62 140" style="height:clamp(6.5rem,18.2vw,14.3rem);width:auto;margin-bottom:clamp(-1.5rem,-4.2vw,-3.3rem)">
-  <!-- bowl - Bodoni style oval with thick-thin contrast -->
-  <ellipse cx="28" cy="62" rx="22" ry="22" fill="none" stroke="#2A2A28" stroke-width="1.5"/>
-  <!-- thick sides of bowl -->
-  <line x1="6.5" y1="54" x2="6.5" y2="72" stroke="#2A2A28" stroke-width="7" stroke-linecap="butt"/>
-  <line x1="49" y1="54" x2="49" y2="72" stroke="#2A2A28" stroke-width="7" stroke-linecap="butt"/>
-  <!-- ear -->
-  <path d="M49,48 Q55,42 55,38" fill="none" stroke="#2A2A28" stroke-width="1.2"/>
-  <!-- right stem connecting to descender -->
-  <line x1="49" y1="44" x2="49" y2="84" stroke="#2A2A28" stroke-width="8" stroke-linecap="butt"/>
-  <!-- THE MOVE: straight hairline descender, no loop, no curve -->
-  <line x1="49" y1="84" x2="49" y2="130" stroke="#2A2A28" stroke-width="1.2" stroke-linecap="butt"/>
-</svg>
-</div>
-
-<!-- h - thick stems, hairline arch -->
-<div class="letter" data-i="3">
-<svg viewBox="0 0 58 120" style="height:clamp(5rem,14vw,11rem);width:auto">
-  <!-- left stem (full height) -->
-  <line x1="12" y1="8" x2="12" y2="100" stroke="#2A2A28" stroke-width="8" stroke-linecap="butt"/>
-  <!-- top serif on left stem -->
-  <line x1="2" y1="8" x2="22" y2="8" stroke="#2A2A28" stroke-width="1.2"/>
-  <!-- bottom serif left -->
-  <line x1="0" y1="100" x2="24" y2="100" stroke="#2A2A28" stroke-width="1.2"/>
-  <!-- arch - hairline -->
-  <path d="M12,56 Q12,42 30,42 Q46,42 46,56" fill="none" stroke="#2A2A28" stroke-width="1.2"/>
-  <!-- right stem -->
-  <line x1="46" y1="56" x2="46" y2="100" stroke="#2A2A28" stroke-width="8" stroke-linecap="butt"/>
-  <!-- bottom serif right -->
-  <line x1="34" y1="100" x2="58" y2="100" stroke="#2A2A28" stroke-width="1.2"/>
-</svg>
-</div>
-
-<!-- t - thin stem, hairline crossbar -->
-<div class="letter" data-i="4">
-<svg viewBox="0 0 46 120" style="height:clamp(5rem,14vw,11rem);width:auto">
-  <!-- stem -->
-  <line x1="20" y1="18" x2="20" y2="94" stroke="#2A2A28" stroke-width="6" stroke-linecap="butt"/>
-  <!-- crossbar -->
-  <line x1="6" y1="42" x2="38" y2="42" stroke="#2A2A28" stroke-width="1.2"/>
-  <!-- foot curve -->
-  <path d="M20,94 Q20,100 28,100 Q36,100 38,96" fill="none" stroke="#2A2A28" stroke-width="1.2"/>
-</svg>
-</div>
-</div>
-
+<div id="word"></div>
 <canvas id="bug"></canvas>
 <div id="interact-layer"></div>
 <button id="info-btn" aria-label="Info">i</button>
@@ -117,13 +49,38 @@ canvas#bug{position:fixed;top:0;left:0;width:100%;height:100%;z-index:2;pointer-
 </div>
 </div>
 <script>
-const spans=document.querySelectorAll('#word .letter');
+// --- Word setup ---
+const wordEl=document.getElementById('word');
+const letters='light'.split('');
+letters.forEach((ch,i)=>{
+  if(ch==='g'){
+    // Custom g: clipped character + straight hairline descender
+    const wrap=document.createElement('span');
+    wrap.className='g-wrap';
+    wrap.dataset.i=i;
+    const gChar=document.createElement('span');
+    gChar.className='g-char';
+    gChar.textContent='g';
+    const gLine=document.createElement('span');
+    gLine.className='g-line';
+    wrap.appendChild(gChar);
+    wrap.appendChild(gLine);
+    wordEl.appendChild(wrap);
+  }else{
+    const s=document.createElement('span');
+    s.textContent=ch;
+    s.dataset.i=i;
+    wordEl.appendChild(s);
+  }
+});
+// Collect all letter elements (spans and g-wrap)
+const spans=wordEl.querySelectorAll('[data-i]');
 
 // --- Info panel ---
 const overlay=document.getElementById('overlay');
-const lines=overlay.querySelectorAll('.line');
-document.getElementById('info-btn').onclick=()=>{overlay.classList.add('open');lines.forEach((l,i)=>{l.style.transitionDelay=(.15*i)+'s'})};
-document.getElementById('close-btn').onclick=()=>{overlay.classList.remove('open');lines.forEach(l=>{l.style.transitionDelay='0s'})};
+const oLines=overlay.querySelectorAll('.line');
+document.getElementById('info-btn').onclick=()=>{overlay.classList.add('open');oLines.forEach((l,i)=>{l.style.transitionDelay=(.15*i)+'s'})};
+document.getElementById('close-btn').onclick=()=>{overlay.classList.remove('open');oLines.forEach(l=>{l.style.transitionDelay='0s'})};
 
 {
 
@@ -198,57 +155,41 @@ function drawBug(dt){
   const cx=bug.x,cy=bug.y;
   const flying=bug.phase!=='land';
   const glowAmt=flying?(.7+.3*Math.sin(Date.now()*.005)):(.3+.15*Math.sin(Date.now()*.003));
-
   ctx.save();
   ctx.translate(cx,cy);
   ctx.scale(bug.facing,1);
-
   const grad=ctx.createRadialGradient(3,-1,2,3,-1,s*1.2);
   grad.addColorStop(0,`rgba(255,217,61,${glowAmt*.5})`);
   grad.addColorStop(1,'rgba(255,217,61,0)');
   ctx.fillStyle=grad;
   ctx.beginPath();ctx.arc(3,-1,s*1.2,0,Math.PI*2);ctx.fill();
-
   if(flying){
     bug.wingPhase+=dt*25;
     const wAng=Math.sin(bug.wingPhase)*.4;
-    ctx.save();
-    ctx.globalAlpha=.18;
-    ctx.fillStyle='#2A2A28';
+    ctx.save();ctx.globalAlpha=.18;ctx.fillStyle='#2A2A28';
     ctx.save();ctx.translate(-2,-4);ctx.rotate(-.6+wAng);
-    ctx.beginPath();ctx.ellipse(0,-5,3.5,8,0,0,Math.PI*2);ctx.fill();
-    ctx.restore();
+    ctx.beginPath();ctx.ellipse(0,-5,3.5,8,0,0,Math.PI*2);ctx.fill();ctx.restore();
     ctx.save();ctx.translate(-2,-2);ctx.rotate(-.3-wAng*.7);
-    ctx.beginPath();ctx.ellipse(0,-4,3,7,0,0,Math.PI*2);ctx.fill();
-    ctx.restore();
+    ctx.beginPath();ctx.ellipse(0,-4,3,7,0,0,Math.PI*2);ctx.fill();ctx.restore();
     ctx.restore();
   }else{
     ctx.save();ctx.globalAlpha=.1;ctx.fillStyle='#2A2A28';
-    ctx.beginPath();ctx.ellipse(-2,-6,2.5,7,-.15,0,Math.PI*2);ctx.fill();
-    ctx.restore();
+    ctx.beginPath();ctx.ellipse(-2,-6,2.5,7,-.15,0,Math.PI*2);ctx.fill();ctx.restore();
   }
-
   ctx.fillStyle='#2A2A28';
   ctx.beginPath();ctx.ellipse(0,0,3.5,6,.1,0,Math.PI*2);ctx.fill();
-
   ctx.fillStyle=`rgba(255,217,61,${glowAmt})`;
   ctx.beginPath();ctx.ellipse(4,1,3,4,0,0,Math.PI*2);ctx.fill();
-
   ctx.strokeStyle='#2A2A28';ctx.lineWidth=.6;
   ctx.beginPath();ctx.moveTo(-3,-5);ctx.quadraticCurveTo(-6,-12,-8,-14);ctx.stroke();
   ctx.beginPath();ctx.moveTo(-2,-5);ctx.quadraticCurveTo(-3,-13,-5,-15);ctx.stroke();
-
   ctx.restore();
-
-  if(flying&&Math.random()<.3){
-    trail.push({x:cx+bug.facing*5,y:cy+1,a:.3,life:1});
-  }
+  if(flying&&Math.random()<.3){trail.push({x:cx+bug.facing*5,y:cy+1,a:.3,life:1})}
 }
 
 function drawTrail(){
   for(let i=trail.length-1;i>=0;i--){
-    const p=trail[i];
-    p.life-=.008;p.a=p.life*.25;
+    const p=trail[i];p.life-=.008;p.a=p.life*.25;
     if(p.life<=0){trail.splice(i,1);continue}
     ctx.fillStyle=`rgba(255,217,61,${p.a})`;
     ctx.beginPath();ctx.arc(p.x,p.y,1.5*p.life,0,Math.PI*2);ctx.fill();
@@ -259,14 +200,11 @@ let lastTime=0;
 function update(now){
   const dt=Math.min((now-(lastTime||now))/1000,.05);
   lastTime=now;
-
   ctx.clearRect(0,0,W,H);
-
   if(bug.phase!=='startle'&&bug.phase!=='enter'){
     const dx=bug.x-mouseX,dy=bug.y-mouseY;
     if(Math.sqrt(dx*dx+dy*dy)<120){startle()}
   }
-
   switch(bug.phase){
     case 'enter':
       bug.timer+=dt;
@@ -275,22 +213,16 @@ function update(now){
       moveBug(dt,2);
       if(distToTarget()<5){startFly()}
       break;
-    case 'fly':
-    case 'flyToLand':
-    case 'startle':
+    case 'fly':case 'flyToLand':case 'startle':
       moveBug(dt,bug.phase==='startle'?4:1.8);
       if(distToTarget()<(bug.phase==='flyToLand'?4:15)){
-        if(bug.phase==='flyToLand'){
-          bug.phase='land';bug.timer=0;
+        if(bug.phase==='flyToLand'){bug.phase='land';bug.timer=0;
           if(bug.targetLetter>=0)spans[bug.targetLetter].classList.add('glow');
-        }else{
-          bug.phase='hover';bug.timer=0;
-        }
+        }else{bug.phase='hover';bug.timer=0}
       }
       break;
     case 'hover':
-      bug.y+=Math.sin(now*.002)*.15;
-      bug.x+=Math.sin(now*.0013)*.1;
+      bug.y+=Math.sin(now*.002)*.15;bug.x+=Math.sin(now*.0013)*.1;
       bug.timer+=dt;
       if(bug.timer>randRange(2,5)){startFly()}
       break;
@@ -302,25 +234,18 @@ function update(now){
       }
       break;
   }
-
   if(Math.abs(bug.vx)>.1)bug.facing=bug.vx>0?1:-1;
-
-  drawTrail();
-  drawBug(dt);
+  drawTrail();drawBug(dt);
   requestAnimationFrame(update);
 }
 
 function moveBug(dt,speed){
   const dx=bug.tx-bug.x,dy=bug.ty-bug.y;
   const d=Math.sqrt(dx*dx+dy*dy)||1;
-  const jx=(Math.random()-.5)*40*dt;
-  const jy=(Math.random()-.5)*40*dt;
-  const ax=(dx/d)*speed*60+jx;
-  const ay=(dy/d)*speed*60+jy;
-  bug.vx+=(ax-bug.vx)*dt*2;
-  bug.vy+=(ay-bug.vy)*dt*2;
-  bug.x+=bug.vx*dt;
-  bug.y+=bug.vy*dt;
+  const jx=(Math.random()-.5)*40*dt;const jy=(Math.random()-.5)*40*dt;
+  const ax=(dx/d)*speed*60+jx;const ay=(dy/d)*speed*60+jy;
+  bug.vx+=(ax-bug.vx)*dt*2;bug.vy+=(ay-bug.vy)*dt*2;
+  bug.x+=bug.vx*dt;bug.y+=bug.vy*dt;
 }
 
 function distToTarget(){
