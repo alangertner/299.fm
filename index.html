@@ -4,12 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>299.fm</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300&display=swap" rel="stylesheet">
 <style>
 @font-face{font-family:'ITC Souvenir';src:url('ITCSouvenirBold.otf') format('opentype');font-weight:700;font-style:normal;font-display:swap}
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{width:100%;height:100%;overflow:hidden}
-body{background:#F5F2EC;font-family:'ITC Souvenir',Georgia,serif;font-weight:700;color:#2A2A28;display:flex;align-items:center;justify-content:center}
-#word{font-size:clamp(4rem,12vw,9rem);letter-spacing:.04em;user-select:none;position:relative;z-index:1}
+body{background:#F5F2EC;font-family:'Cormorant Garamond',serif;font-weight:300;color:#2A2A28;display:flex;align-items:center;justify-content:center}
+#word{font-size:clamp(4rem,12vw,9rem);letter-spacing:.04em;user-select:none;position:relative;z-index:1;transition:font-family .4s,font-weight .4s,letter-spacing .4s}
+#word.lit{font-family:'ITC Souvenir',Georgia,serif;font-weight:700;letter-spacing:.02em}
 #word span{display:inline-block;transition:color .4s,text-shadow .4s}
 #word span.glow{color:#FFD93D;text-shadow:0 0 18px rgba(255,217,61,.45)}
 canvas#bug{position:fixed;top:0;left:0;width:100%;height:100%;z-index:2;pointer-events:none}
@@ -86,7 +88,7 @@ function startle(){
   const a=Math.atan2(bug.y-mouseY,bug.x-mouseX);
   bug.tx=Math.max(40,Math.min(W-40,bug.x+Math.cos(a)*randRange(150,300)));
   bug.ty=Math.max(40,Math.min(H-40,bug.y+Math.sin(a)*randRange(100,200)));
-  bug.landedOn=-1;spans.forEach(s=>s.classList.remove('glow'));
+  bug.landedOn=-1;spans.forEach(s=>s.classList.remove('glow'));wordEl.classList.remove('lit');
 }
 
 const trail=[];
@@ -113,9 +115,9 @@ function update(now){
   if(bug.phase!=='startle'&&bug.phase!=='enter'){const dx=bug.x-mouseX,dy=bug.y-mouseY;if(Math.sqrt(dx*dx+dy*dy)<120)startle()}
   switch(bug.phase){
     case'enter':bug.timer+=dt;if(bug.timer<1.5)break;bug.tx=W/2;bug.ty=H/2-20;moveBug(dt,2);if(distToTarget()<5)startFly();break;
-    case'fly':case'flyToLand':case'startle':moveBug(dt,bug.phase==='startle'?4:1.8);if(distToTarget()<(bug.phase==='flyToLand'?4:15)){if(bug.phase==='flyToLand'){bug.phase='land';bug.timer=0;if(bug.targetLetter>=0)spans[bug.targetLetter].classList.add('glow')}else{bug.phase='hover';bug.timer=0}}break;
+    case'fly':case'flyToLand':case'startle':moveBug(dt,bug.phase==='startle'?4:1.8);if(distToTarget()<(bug.phase==='flyToLand'?4:15)){if(bug.phase==='flyToLand'){bug.phase='land';bug.timer=0;if(bug.targetLetter>=0){spans[bug.targetLetter].classList.add('glow');wordEl.classList.add('lit')}}else{bug.phase='hover';bug.timer=0}}break;
     case'hover':bug.y+=Math.sin(now*.002)*.15;bug.x+=Math.sin(now*.0013)*.1;bug.timer+=dt;if(bug.timer>randRange(2,5))startFly();break;
-    case'land':bug.timer+=dt;if(bug.timer>randRange(2.5,5)){if(bug.targetLetter>=0)spans[bug.targetLetter].classList.remove('glow');startFly()}break;
+    case'land':bug.timer+=dt;if(bug.timer>randRange(2.5,5)){if(bug.targetLetter>=0){spans[bug.targetLetter].classList.remove('glow');wordEl.classList.remove('lit')}startFly()}break;
   }
   if(Math.abs(bug.vx)>.1)bug.facing=bug.vx>0?1:-1;
   drawTrail();drawBug(dt);requestAnimationFrame(update);
